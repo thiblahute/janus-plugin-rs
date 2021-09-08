@@ -105,8 +105,12 @@ impl PluginResult {
 
     /// Creates a plugin result indicating an error. The provided error text will be synchronously passed
     /// back to the client.
-    pub fn error(msg: &'static CStr) -> Self {
-        unsafe { Self::new(PluginResultType::JANUS_PLUGIN_ERROR, msg.as_ptr(), ptr::null_mut()) }
+    pub fn error(msg: &'static CStr, response: Option<JanssonValue>) -> Self {
+        let json = match response {
+            Some(json) => json.into_raw(),
+            _ => ptr::null_mut()
+        };
+        unsafe { Self::new(PluginResultType::JANUS_PLUGIN_ERROR, msg.as_ptr(), json) }
     }
 
     /// Transfers ownership of this result to the wrapped raw pointer. The consumer is responsible for calling
